@@ -1,0 +1,31 @@
+# Ignore compiled files
+md_temp
+*.o
+*.out
+
+# Ignore backup or temporary files
+*~
+*.swp
+*.tmp
+.DS_Store
+
+# Ignore output files
+results.txt
+*.log
+
+# Ignore system-specific files
+Thumbs.db
+desktop.ini
+
+# Ignore macOS-specific files
+__MACOSX
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+*.iml
+
+# Ignore Python virtual environments if applicable
+venv/
+*.pyc
+__pycache__/
