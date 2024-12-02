@@ -11,69 +11,42 @@ USAGE
 #include "md_temp.h"
 #include <time.h>
 
-FILE *outputFile;
+#define GRID_SIZE 4
 
+// Initialize output
 void InitOutput() {
-    outputFile = fopen("results.txt", "w");
-    fprintf(outputFile, "Time Temperature Pressure PotentialEnergy TotalEnergy\n");
-}
+ 	FILE *totalFile = fopen("total_res.txt", "w");
+    FILE *layersFile = fopen("layers_res.txt", "w");
 
-void WriteOutput() {
-    fprintf(outputFile, "%9.6f %9.6f %9.6f %9.6f %9.6f\n",
-            stepCount * DeltaT, temperature, pressure, potEnergy, totEnergy);
-}
+    // Add column headers for total_res.txt
+    fprintf(totalFile, "Time Temperature Pressure PotentialEnergy TotalEnergy\n");
 
+    // Dynamically generate column headers for layers_res.txt
+    fprintf(layersFile, "Time");
+    for (int i = 0; i < GRID_SIZE; i++) {
+        fprintf(layersFile, " Layer%d", i + 1);
+    }
+    fprintf(layersFile, "\n");
+
+    fclose(totalFile);
+    fclose(layersFile);
+}
 
 int main(int argc, char **argv) {
-	InitOutput(); // Out put file log
 	double cpu, cpu1, cpu2;
-	InitParams();  // 
+	InitParams();  
 	InitConf(); 
 	ComputeAccel(); /* Computes initial accelerations */ 
+	InitOutput();
 	cpu1 = ((double) clock())/CLOCKS_PER_SEC;
-	printf("StepLimit: %d\n", StepLimit);
-	printf("StepAvg: %d\n", StepAvg);
 	for (stepCount=1; stepCount<=StepLimit; stepCount++) {
 		SingleStep(); 
-		if (stepCount%StepAvg == 0) {
-			printf("log");
-			EvalProps();
-			WriteOutput(); // write evalProps results in results file
-		}
+		if (stepCount%StepAvg == 0) EvalProps();
 	}
 	cpu2 = ((double) clock())/CLOCKS_PER_SEC;
 	cpu = cpu2-cpu1;
 	printf("Execution time (s) = %le\n",cpu);
-	fclose(outputFile); // close file
 	return 0;
-}
-
-void ComputePressure() {
-/*------------------------------------------------------------------------------
-基于分子间作用力和系统体积计算压力。
-------------------------------------------------------------------------------*/
-    double virial = 0.0;
-    double volume = Region[0] * Region[1] * Region[2]; // 计算系统体积
-    int j1, j2, k;
-
-    for (j1 = 0; j1 < nAtom - 1; j1++) {
-        for (j2 = j1 + 1; j2 < nAtom; j2++) {
-            double dr[3], rr = 0.0, f;
-            for (k = 0; k < 3; k++) {
-                dr[k] = r[j1][k] - r[j2][k];
-                dr[k] -= SignR(RegionH[k], dr[k] - RegionH[k])
-                          - SignR(RegionH[k], dr[k] + RegionH[k]);
-                rr += dr[k] * dr[k];
-            }
-            if (rr < RCUT * RCUT) {
-                double ri2 = 1.0 / rr;
-                double ri6 = ri2 * ri2 * ri2;
-                f = 48.0 * ri2 * ri6 * (ri6 - 0.5);
-                virial += rr * f; // 累加维里项
-            }
-        }
-    }
-    pressure = (nAtom * temperature + virial) / (3.0 * volume); // 计算压力
 }
 
 /*----------------------------------------------------------------------------*/
@@ -141,6 +114,19 @@ void InitConf() {
 	vMag = sqrt(3*InitTemp);
 	for(k=0; k<3; k++) vSum[k] = 0.0;
 	for(n=0; n<nAtom; n++) {
+
+		// Determine the layer index of the particle
+		int zIdx = (int)(r[n][2] / (Region[2] / InitUcell[2])); // Layer index based on z-coordinate
+
+		// Adjust the velocity magnitude based on the layer index
+		if (zIdx == 0) { 
+			// For the first layer, use higher temperature
+			vMag = sqrt(3 * 10.0 * InitTemp); // Higher temperature is twice the initial temperature
+		} else {
+			// For other layers, use the default temperature
+			vMag = sqrt(3 * InitTemp);
+		}
+
 		RandVec3(e,&seed);
 		for (k=0; k<3; k++) {
 			rv[n][k] = vMag*e[k];
@@ -231,25 +217,56 @@ void ApplyBoundaryCond() {
 
 void EvalProps() {
 /*------------------------------------------------------------------------------
-Calculate and evaluate physical properties, including temperature, pressure, etc.
+    The layers evaluate physical properties: kinetic energy, temperature, etc., at each layer.
 ------------------------------------------------------------------------------*/
+    double layerKinEnergy[GRID_SIZE] = {0.0};  // Sum of kinetic energy in each layer
+    double layerCount[GRID_SIZE] = {0.0};      // The number of particles in each layer
     double vv;
     int n, k;
 
-    kinEnergy = 0.0;
+    // Open files
+    FILE *totalFile = fopen("total_res.txt", "a");
+    FILE *layersFile = fopen("layers_res.txt", "a");
+
+    // Calculate the kinetic energy of each particle and categorize it into the corresponding layer
     for (n = 0; n < nAtom; n++) {
         vv = 0.0;
         for (k = 0; k < 3; k++)
-            vv += rv[n][k] * rv[n][k];
-        kinEnergy += vv;
+            vv += rv[n][k] * rv[n][k]; // Kinetic energy is proportional to the square of velocity
+
+        double kineticEnergy = 0.5 * vv; // Kinetic energy of a single particle
+        int zIdx = (int)(r[n][2] / (Region[2] / GRID_SIZE)); // Determine the layer based on the z-coordinate
+
+        if (zIdx >= 0 && zIdx < GRID_SIZE) {
+            layerKinEnergy[zIdx] += kineticEnergy; // Accumulate kinetic energy for the corresponding layer
+            layerCount[zIdx]++; // Count the number of particles in this layer
+        }
     }
-    kinEnergy *= (0.5 / nAtom);
-    potEnergy /= nAtom;
+
+    // Output the average kinetic energy and temperature of each layer to layers_res.txt
+    fprintf(layersFile, "%9.6f", stepCount * DeltaT);
+    for (int i = 0; i < GRID_SIZE; i++) {
+        double avgKinEnergy = layerCount[i] > 0 ? layerKinEnergy[i] / layerCount[i] : 0.0;
+        double temperature = avgKinEnergy * 2.0 / 3.0; // Calculate temperature based on kinetic energy
+        fprintf(layersFile, " %9.6f", temperature); // Save the temperature of each layer
+    }
+    fprintf(layersFile, "\n"); // Newline
+
+    // Calculate total kinetic energy and temperature
+    kinEnergy = 0.0;
+    for (int i = 0; i < GRID_SIZE; i++) {
+        kinEnergy += layerKinEnergy[i];
+    }
+    kinEnergy /= nAtom; // Average kinetic energy
+    potEnergy /= nAtom; // Average potential energy
     totEnergy = kinEnergy + potEnergy;
     temperature = kinEnergy * 2.0 / 3.0;
 
-    ComputePressure(); // compute pressure
+    // Save total properties to total_res.txt
+    fprintf(totalFile, "%9.6f %9.6f %9.6f %9.6f\n",
+            stepCount * DeltaT, temperature, potEnergy, totEnergy);
 
-    printf("%9.6f %9.6f %9.6f %9.6f %9.6f\n",
-           stepCount * DeltaT, temperature, pressure, potEnergy, totEnergy);
+    // Close files
+    fclose(totalFile);
+    fclose(layersFile);
 }

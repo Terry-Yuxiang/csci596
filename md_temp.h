@@ -1,18 +1,12 @@
 /*******************************************************************************
 File md.h is an include file for program md.c.
 *******************************************************************************/
-#include <Kernel/math.h>
 #define NMAX 100000  /* Maximum number of atoms which can be simulated */
 #define RCUT 2.5     /* Potential cut-off length */
 #define PI 3.141592653589793
 /* Constants for the random number generator */
 #define D2P31M 2147483647.0
 #define DMUL 16807.0
-
-/*new add*/
-double pressure; // 用于存储压力
-void ComputePressure();
-/*new add*/
 
 /* Functions & function prototypes ********************************************/
 
