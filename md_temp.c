@@ -11,7 +11,7 @@ USAGE
 #include "md_temp.h"
 #include <time.h>
 
-#define GRID_SIZE 4
+#define GRID_SIZE 10
 
 // Initialize output
 void InitOutput() {

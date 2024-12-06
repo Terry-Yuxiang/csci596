@@ -1,8 +1,8 @@
 # CSCI 596 Final Project
 
-## Dynamic Visualization of Temperature and Pressure Fields in Fluid Systems
+## Dynamic Visualization of Molecular Temperature and Heat Transfer in Systems
 
-This project implements a molecular dynamics (MD) simulation to dynamically visualize the temperature and pressure distribution in a fluid system under various conditions.
+This project focuses on implementing a molecular dynamics (MD) simulation to dynamically visualize temperature variations and heat transfer across molecular layers in a fluid system under various conditions. The primary goal is to observe and analyze the propagation of temperature changes and their effect on molecular behavior, providing an intuitive understanding of thermal dynamics.
 
 ---
 
@@ -39,3 +39,11 @@ Ensure a file named md.in exists in the same directory and follows the required 
 0.005         # Time step size for the simulation (DeltaT)
 10000         # Total number of simulation steps to execute (StepLimit)
 100           # Number of steps between each data output (StepAvg)
+
+
+## 视频展示
+
+<video width="640" height="360" controls>
+  <source src="https://github.com/Terry-Yuxiang/csci596/raw/main/assets/show1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
