@@ -47,3 +47,5 @@ Ensure a file named md.in exists in the same directory and follows the required 
   <source src="./asset/show1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+
+![temp](./asset/show1.gif)
