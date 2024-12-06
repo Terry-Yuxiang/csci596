@@ -64,10 +64,10 @@ The final video will be saved as `simulation.mp4` in the frames directory.
 
 
 ## Initial effect demonstration
+Temperature scale: Deep blue (coolest) → Light blue → White → Light red → Deep red (hottest)
 ### Four layers of molecular temperature transfer 
 ![temp](./asset/show1.gif)
-Temperature scale: Deep blue (coolest) → Light blue → White → Light red → Deep red (hottest)
+
 
 ### Ten layers of molecular temperature transfer 
 ![temp](./asset/show2.gif)
-Temperature scale: Deep blue (coolest) → Light blue → White → Light red → Deep red (hottest)
