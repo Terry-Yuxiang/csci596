@@ -41,11 +41,9 @@ Ensure a file named md.in exists in the same directory and follows the required 
 100           # Number of steps between each data output (StepAvg)
 ```
 
-## 视频展示
-
-<video width="640" height="360" controls>
-  <source src="./asset/show1.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
+## Initial effect demonstration
+### Four layers of molecular temperature transfer 
 ![temp](./asset/show1.gif)
+
+### Ten layers of molecular temperature transfer 
+![temp](./asset/show2.gif)
