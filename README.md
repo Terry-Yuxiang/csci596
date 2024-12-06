@@ -39,11 +39,11 @@ Ensure a file named md.in exists in the same directory and follows the required 
 0.005         # Time step size for the simulation (DeltaT)
 10000         # Total number of simulation steps to execute (StepLimit)
 100           # Number of steps between each data output (StepAvg)
-
+```
 
 ## 视频展示
 
 <video width="640" height="360" controls>
-  <source src="https://github.com/Terry-Yuxiang/csci596/raw/main/assets/show1.mp4" type="video/mp4">
+  <source src="./asset/show1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
