@@ -4,6 +4,34 @@
 
 This project focuses on implementing a molecular dynamics (MD) simulation to dynamically visualize temperature variations and heat transfer across molecular layers in a fluid system under various conditions. The primary goal is to observe and analyze the propagation of temperature changes and their effect on molecular behavior, providing an intuitive understanding of thermal dynamics.
 
+## Project Overview
+
+This project aims to simulate and visualize temperature transfer in a molecular system using Molecular Dynamics (MD). We create a closed system where:
+
+1. **Temperature Gradient Setup**:
+   - First layer: High temperature
+   - Last layer: High temperature
+   - Other layers: Low temperature
+   - Observing heat transfer between these extremes
+   
+2. **System Size Analysis**:
+   - Adjustable system size through unit cell parameters (X, Y, Z directions)
+   - Enables simulation of different molecular quantities
+   - Allows analysis of how system size affects heat transfer dynamics
+
+3. **Key Observations**:
+   - Temperature propagation patterns across molecular layers
+   - Molecular motion and behavior during heat transfer
+   - System equilibrium achievement process
+   - Impact of system size on heat transfer rates
+
+### Simulation Features
+- Closed system simulation (constant volume, particle number)
+- Customizable initial conditions through `md.in` file
+- Real-time visualization of:
+  - Molecular movements
+  - Temperature distribution (Deep blue [coolest] → Light blue → White → Light red → Deep red [hottest])
+  - Heat transfer pathways
 ---
 
 ## How to Run
