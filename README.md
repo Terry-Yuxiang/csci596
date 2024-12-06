@@ -41,9 +41,33 @@ Ensure a file named md.in exists in the same directory and follows the required 
 100           # Number of steps between each data output (StepAvg)
 ```
 
+### Visualization with PyMOL
+1. **Generate PDB file**:
+   ```bash
+   python generate_water_matrix.py
+   ```
+
+2. **Open PyMOL and run simulation**:
+   ```bash
+   cd /path/to/project
+   pymol
+   run simulate_molecular_motion.py
+   ```
+
+3. **Generate video from frames**:
+   ```bash
+   cd frames
+   ffmpeg -framerate 24 -i frame_%04d.png -c:v libx264 -r 30 -pix_fmt yuv420p simulation.mp4
+   ```
+
+The final video will be saved as `simulation.mp4` in the frames directory.
+
+
 ## Initial effect demonstration
 ### Four layers of molecular temperature transfer 
 ![temp](./asset/show1.gif)
+Temperature scale: Deep blue (coolest) → Light blue → White → Light red → Deep red (hottest)
 
 ### Ten layers of molecular temperature transfer 
 ![temp](./asset/show2.gif)
+Temperature scale: Deep blue (coolest) → Light blue → White → Light red → Deep red (hottest)
